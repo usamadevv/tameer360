@@ -141,6 +141,19 @@ else{
 }
    
 });
+socket.on('notify', ({to}) => {
+  console.log(to)
+  console.log(activeConnections)
+
+var tempconn=activeConnections.find(val=>val.userid===to)
+if(tempconn){
+io.to(tempconn.id).emit('notify',{to})
+}
+else{
+
+}
+ 
+});
 socket.on('disconnect', () => {
  const ft= activeConnections.filter(val=>val.id!==socket.id)
  activeConnections=ft

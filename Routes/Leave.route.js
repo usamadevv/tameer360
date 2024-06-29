@@ -7,14 +7,9 @@ var nodemailer = require('nodemailer');
 let Siteatt = require('../Models/siteatt');
 let Siteuserd = require('../Models/Siteuser');
 const authenticate = require('../middleWare.js/Authenticate');
+const Email = require('../Models/Email');
 
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'saleemjadoon7666@gmail.com',
-        pass: 'qjuljgycnglhkkmv'
-    }
-});
+
 
 Leaveroute.route('/update').post(function(req, res) {
     Leave.findByIdAndUpdate(
@@ -157,27 +152,65 @@ Leaveroute.route('/add').post(authenticate, function(req, res) {
                             res.send('invalid')
                         }
                         else{
-                            const mailOptions = {
-                                from: `${req.body.username} requested for leave`, // sender address
-                                to: req.body.email, // list of receivers
-                                subject: `New leave request from ${req.body.username} `, // Subject line
-                                html: `<h4>Approve or decline request from the app</h4>
-                                <br />
-                                <p>Duration:  ${req.body.date}  -   ${req.body.to}</p>
-                                `// plain text body
-                            };
-                                 
-                            transporter.sendMail(mailOptions, function (err, info) {
-                                if(err){
-                                    console.log(err)
-                                        res.status(200).json({'Siteuserd':'fail'});}
-                                else{
-                                    console.log(info);
-                                    
-                            res.status(200).json({'Siteuserd':'emailok'});}
-                            })
-            
-                            res.status(200).json({'Leave': 'Leave added successfully'});
+
+
+                            Email.findOne(
+                                { }, 
+                            
+                               
+                            
+                               function (errorx, result) {
+                                     if (errorx) {
+                                        res.send('error')
+                                     } else {
+                                        if(!result){
+                            
+                                            res.send('invalid')
+                                        }
+                                        else{
+                                            var transporter = nodemailer.createTransport({
+                                                service: 'gmail',
+                                                auth: {
+                                                    user: result.email,
+                                                    pass: result.pass
+                                                }
+                                            });
+                        
+                                          
+                                            
+                                            const mailOptions = {
+                                                from: `${req.body.username} requested for leave`, // sender address
+                                                to: req.body.email, // list of receivers
+                                                subject: `New leave request from ${req.body.username} `, // Subject line
+                                                html: `<h4>Approve or decline request from the app</h4>
+                                                <br />
+                                                <p>Duration:  ${req.body.date}  -   ${req.body.to}</p>
+                                                `// plain text body
+                                            };
+                                                 
+                                            transporter.sendMail(mailOptions, function (err, info) {
+                                                if(err){
+                                                    console.log(err)
+                                                        res.status(200).json({'Siteuserd':'fail'});}
+                                                else{
+                                                    console.log(info);
+                                                    
+                                            res.status(200).json({'Siteuserd':'emailok'});}
+                                            })
+                            
+                                            res.status(200).json({'Leave': 'Leave added successfully'});
+                                            console.log(result)
+                            
+                                        }
+                                        
+                                     }
+                                 }
+                            
+                              
+                            )
+
+
+                           
                         }
                         
                      }
