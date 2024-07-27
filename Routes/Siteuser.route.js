@@ -1222,6 +1222,38 @@ Siteroute.route('/find').post(authenticate, function (req, res) {
 
 
 });
+Siteroute.route('/findmobilehome').post(authenticate, function (req, res) {
+    const projection = { travel: 0 ,addedusers:0}; // Exclude 'password' field
+
+    Siteuserd.find(
+        { _id: req.body.Siteuserd_id },
+        projection,
+
+        function (error, success) {
+            if (error) {
+                res.send('error')
+            } else {
+                if (!success) {
+
+                    res.send('invalid')
+                }
+                else {
+
+
+                    var hrstoupdate = success
+                  
+                    res.status(200).json({ 'Siteuserd': hrstoupdate });
+                }
+
+            }
+        }
+
+
+    )
+
+
+
+});
 Siteroute.route('/superbycom').post(function (req, res) {
     Siteuserd.find(
         {
@@ -1454,6 +1486,142 @@ Client.find(
 
 
 });
+Siteroute.route('/findbycompanynotes').post(function (req, res) {
+    console.log(req.body)
+    const projection={travel:0}
+    Client.find(
+        {
+            _id: new ObjectId(req.body.clientid),
+          adminrights:'Allowed',
+          
+        },
+        projection,
+    
+        function (error3, success3) {
+            if (error3) {
+                res.send('error')
+            } else {
+                if (!success3||success3.length===0) {
+                    Client.find(
+                        {
+                          adminrights:'Allowed',
+                          
+                        },
+                
+                        function (error2, success2) {
+                            if (error2) {
+                                res.send('error')
+                            } else {
+                                if (!success2) {
+                
+                                    Siteuserd.find(
+                                        { clientid:req.body.clientid },
+                                        projection,
+                                
+                                        function (error, success) {
+                                            if (error) {
+                                                res.send('error')
+                                            } else {
+                                                if (!success) {
+                                
+                                                    res.send('invalid')
+                                                }
+                                                else {
+                                                  
+                                                    res.status(200).json({ 'Siteuserd': success });
+                                                }
+                                
+                                            }
+                                        }
+                                
+                                
+                                    )
+                                }
+                                else {
+                                    var clientids=[]
+                                    
+                
+                          success2.forEach(element => {
+                                    if(element._id=== req.body.clientid)
+                                    {
+                                       
+                                    
+                                    }
+                                        else{
+                
+                                            clientids.push(element._id)                        }
+                                    })
+                                    clientids.push(req.body.clientid)
+                                    
+                                  
+                
+                                    Siteuserd.find(
+                                        { clientid:{$in: clientids},status:'Active' },
+                                projection,
+                                        function (error, success) {
+                                            if (error) {
+                                                res.send('error')
+                                            } else {
+                                                if (!success) {
+                                
+                                                    res.send('invalid')
+                                                }
+                                                else {
+                                                    console.log(clientids)
+                                                    console.log(success)
+                                                    res.status(200).json({ 'Siteuserd': success });
+                                                }
+                                
+                                            }
+                                        }
+                                
+                                
+                                    )
+                                }
+                
+                            }
+                        }
+                
+                
+                    )
+                   
+                }
+                else {
+                    Siteuserd.find(
+                        { status:'Active'},
+                        projection,
+                
+                        function (error, success) {
+                            if (error) {
+                                res.send('error')
+                            } else {
+                                if (!success) {
+                
+                                    res.send('invalid')
+                                }
+                                else {
+                                    console.log(success3)
+                                    res.status(200).json({ 'Siteuserd': success });
+                                }
+                
+                            }
+                        }
+                
+                
+                    )
+                }
+    
+            }
+        }
+    
+    
+    )
+    
+    
+    
+    
+    
+    });
 Siteroute.route('/findbyname').post(function (req, res) {
 
     Siteuserd.find(
