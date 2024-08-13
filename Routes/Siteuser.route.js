@@ -1710,6 +1710,44 @@ Siteroute.route('/login').post(function (req, res) {
 
 
 });
+Siteroute.route('/verifypass').post(function (req, res) {
+    Siteuserd.findOne(
+        {
+            _id: req.body.id,
+        },
+
+        function (error, success) {
+            if (error) {
+
+                console.log(error)
+                res.send('error')
+            } else {
+                if (!success) {
+
+                    res.send('invalid')
+                }
+                else {
+                    console.log(success)
+                    if(req.body.password===success.password){
+
+                        res.status(200).json({ 'Siteuserd': 'valid' });
+                    }
+                    else{
+
+                        res.status(200).json({ 'Siteuserd': 'invalid' });
+                    }
+
+                }
+
+            }
+        }
+
+
+    )
+
+
+
+});
 
 Siteroute.route('/reset').post(function (req, res) {
     console.log(req.body)
